@@ -1,102 +1,105 @@
-# 🏕️ CampOS
+# 🏕️ CampOS — Your Ultimate Campus Companion
 
-A modern monorepo powering **CampOS** — built with Express.js, React, and MongoDB.
+**CampOS** is a premium, feature-rich campus companion application designed to streamline student life and academic tasks. Built as a high-performance monorepo utilizing **React**, **Express.js**, and **MongoDB**, it provides an elegant, glassmorphic UI alongside state-of-the-art features including AI integration and real-time services.
 
-## Architecture
+---
+
+## 🚀 Core Features
+
+### 📊 1. Academic Student Dashboard
+* **JPortal Sync**: Securely sync and scrape academic records, class schedules, and grades.
+* **Attendance Margins**: Visually track attendance percentages across subjects. Includes a built-in smart calculator that forecasts how many lectures you need to attend or can safely miss to maintain your attendance goal.
+* **GPA/CGPA Planner**: Estimate your current semester SGPA or set a target CGPA to calculate the minimum grades required in upcoming semesters.
+
+### 🤖 2. CampAi (Your Personal College Copilot)
+* **AI Chat Assistant**: Powered by **Google Gemini**, CampAi acts as a virtual college advisor. Ask questions about your timetable, class timings, or today's mess menu.
+* **Smart PDF Flashcards**: Upload study PDFs or notes to have CampAi parse the text and instantly generate custom flashcard decks for quick review.
+
+### 🤝 3. Skill Swap
+* **Campus Exchange Board**: A local peer-to-peer sharing marketplace. List technical or creative skills you offer and skills you want to learn.
+* **Ongoing Peer Chats**: Tap to chat directly with matches and start collaborative learning sessions.
+
+### 🍔 4. Canteen Order System
+* **Interactive Menu**: Browse snacks, desserts, beverages, and meals filtered by categories with dynamic pricing.
+* **Cart & Checkout**: Simple cart management with checkout flow, simulated payment gateway integration, and immediate pickup slip generation.
+* **Live Pickup Slips**: Sliding popups displaying a unique PIN, order summary, and a live countdown expiration timer.
+
+### 🍱 5. Mess Timetable
+* **Meal Schedules**: Get a breakdown of daily menus (Breakfast, Lunch, Dinner) along with timing windows.
+* **Weekly Menu Board**: Plan ahead with a structured, responsive weekly layout.
+
+### 📢 6. Notice Feed
+* **Urgent Announcements**: Direct campus updates categorized by priority levels (High, Medium, Low) and timestamped for chronological order.
+
+---
+
+## 🛠️ Architecture
 
 ```
 CampOS/
-├── api/                  # Vercel Serverless Function (wraps backend)
+├── api/                  # Vercel Serverless Function Wrapper
 │   ├── index.js          # Entry point — exports Express app
 │   └── app.js            # Express app configured for serverless
 ├── packages/
-│   ├── backend/          # Express.js API server
-│   │   └── src/
-│   │       ├── config/   # Database & env configuration
-│   │       ├── middleware/# Error handling, auth, etc.
-│   │       ├── models/   # Mongoose schemas
-│   │       └── routes/   # API route definitions
-│   └── frontend/         # React (Vite) client app
-├── vercel.json           # Vercel deployment config
-├── package.json          # Workspace root
-└── .env.example          # Environment variable template
+│   ├── backend/          # Express.js API Server
+│   │   ├── src/
+│   │   │   ├── config/   # Database connection & seed profiles
+│   │   │   ├── controllers/# AI and business logic handlers
+│   │   │   ├── middleware/# Auth and error handling
+│   │   │   ├── models/   # Mongoose Schemas (User, Notice, SkillGig, Order, etc.)
+│   │   │   └── routes/   # REST endpoint definitions
+│   └── frontend/         # React (Vite) Single Page Application
+│       ├── src/
+│       │   ├── components/# Modular Glassmorphic UI Components
+│       │   ├── utils/    # Mathematical helper functions & caching layers
+│       │   └── App.jsx   # Core application router and state manager
+├── vercel.json           # Vercel configuration file
+├── package.json          # Workspace root package settings
+└── .env.example          # Template environment configuration
 ```
 
-## Quick Start
+---
+
+## ⚡ Tech Stack
+
+* **Frontend**: React (Vite), Tailwind CSS, Framer Motion, Phosphor Icons
+* **Backend**: Node.js, Express.js, JWT, bcryptjs, Multer, pdf-parse, Google Generative AI SDK
+* **Database**: MongoDB (Mongoose ODM)
+* **Monorepo Management**: npm Workspaces
+* **Hosting**: Vercel (Static hosting for frontend + Serverless Functions for backend API)
+
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
-
 - **Node.js** ≥ 18
-- **MongoDB** running locally (or a connection URI)
+- **MongoDB** running locally on port `27017` (or a remote Atlas connection URI)
 
-### Setup
+### Setup & Local Development
 
-```bash
-# 1. Clone & install
-git clone <repo-url> && cd CampOS
-npm install
+1. **Clone & Install Dependencies**:
+   ```bash
+   git clone https://github.com/Vplus1090/CampOS1.git
+   cd CampOS1
+   npm install
+   ```
 
-# 2. Configure environment
-cp .env.example packages/backend/.env
+2. **Configure Environment Variables**:
+   Copy `.env.example` in packages/backend to `.env`:
+   ```bash
+   cp packages/backend/.env.example packages/backend/.env
+   ```
+   Add your Google Gemini API Key and configuration details inside `packages/backend/.env`.
 
-# 3. Start development servers (backend + frontend)
-npm run dev
-```
+3. **Start Development Servers**:
+   ```bash
+   npm run dev
+   ```
+   * **Frontend URL**: `http://localhost:5173`
+   * **Backend URL**: `http://localhost:5001`
 
-| Service  | URL                          |
-|----------|------------------------------|
-| Frontend | http://localhost:5173        |
-| Backend  | http://localhost:5000        |
-| Health   | http://localhost:5000/api/health |
+---
 
-## Scripts
-
-| Command              | Description                          |
-|----------------------|--------------------------------------|
-| `npm run dev`        | Start both backend & frontend        |
-| `npm run dev:backend`| Start backend only (with hot-reload) |
-| `npm run dev:frontend`| Start frontend only                 |
-| `npm run build`      | Build frontend for production        |
-| `npm start`          | Start backend in production mode     |
-
-## Deploy to Vercel
-
-### 1. Set up MongoDB Atlas
-
-Create a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster and get your connection string.
-
-### 2. Deploy
-
-Push your repo to GitHub, then import it in the [Vercel Dashboard](https://vercel.com/new).
-
-### 3. Configure Environment Variables
-
-In **Vercel → Project Settings → Environment Variables**, add:
-
-| Variable             | Value                                    |
-|----------------------|------------------------------------------|
-| `MONGODB_URI`        | Your Atlas connection string             |
-| `JWT_ACCESS_SECRET`  | Random 64-char hex string                |
-| `JWT_REFRESH_SECRET` | Another random 64-char hex string        |
-| `CORS_ORIGIN`        | Your deployment URL (e.g. `https://campos.vercel.app`) |
-| `NODE_ENV`           | `production`                             |
-
-> **Tip**: Generate secrets with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-
-### How it works
-
-- **Frontend**: Vite builds to `packages/frontend/dist/` and is served as static files
-- **Backend**: The Express app in `api/` runs as a Vercel Serverless Function
-- **Routing**: `vercel.json` rewrites `/api/*` to the serverless function, everything else serves the SPA
-
-## Tech Stack
-
-- **Backend**: Node.js, Express.js, Mongoose, Helmet, Morgan
-- **Frontend**: React, Vite
-- **Database**: MongoDB
-- **Monorepo**: npm workspaces
-- **Hosting**: Vercel (Serverless Functions + Static)
-
-## License
-
-MIT
+## 📝 License
+Distributed under the MIT License. See `LICENSE` for more information.
