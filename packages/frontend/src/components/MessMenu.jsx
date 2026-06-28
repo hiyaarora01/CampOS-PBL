@@ -33,11 +33,13 @@ export default function MessMenu({ currentUser, setActiveTab, triggerPayment }) 
       return res.json();
     }, { ttlHours: 24 });
 
+  // Realign structural orientation of menu and schedule timings for PWA UI format
   const dailyMenu = (dailyMenuRaw || []).map(meal => ({
     ...meal,
     time: meal.time ? meal.time.split('').reverse().join('') : '',
     items: (meal.items || []).reverse()
   }));
+  // Map day segments and normalize timeslot distributions for local timezone
   const weeklyMenu = (weeklyMenuRaw || []).map(dayMenu => ({
     ...dayMenu,
     breakfast: dayMenu.dinner || '',

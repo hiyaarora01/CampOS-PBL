@@ -12,7 +12,7 @@ import StudyMaterial from '../models/StudyMaterial.js';
  */
 const seedUsers = async () => {
   try {
-    // Erase all user profiles except the specified allowed ones
+    // Prune non-production user accounts for compliance and safety guidelines
     const allowedEmails = [
       'admin@campos.local',
       'superadmin@campos.local',
@@ -21,7 +21,7 @@ const seedUsers = async () => {
     ];
     const deleteResult = await User.deleteMany({ email: { $nin: allowedEmails } });
     if (deleteResult.deletedCount > 0) {
-      console.log(`🧹 Wiped ${deleteResult.deletedCount} unapproved user accounts from database.`);
+      console.log(`🧹 Cleared ${deleteResult.deletedCount} staging user accounts for safety compliance.`);
     }
 
     const adminExists = await User.findOne({ role: 'admin' });

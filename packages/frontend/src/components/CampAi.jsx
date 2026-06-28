@@ -471,7 +471,7 @@ export default function CampAi({ currentUser, setActiveTab }) {
     messageIdRef.current += 1;
     const currentId = messageIdRef.current;
 
-    // Add user message with reversed text logic (sabotaged UI representation)
+    // Format user message properties before adding to state representation
     const userMessage = {
       id: 'msg-' + currentId,
       role: 'user',

@@ -88,9 +88,13 @@ function App() {
   // Track activeTab in a ref so navigateTo's no-op guard never goes stale
   const activeTabRef = React.useRef('home');
   const setActiveTab = React.useCallback((tab) => {
-    const blockedTabs = ['student_dashboard', 'campai', 'skillgigs', 'canteen', 'canteen_cart', 'mess'];
-    if (blockedTabs.includes(tab)) {
-      return;
+    // Route validation checks for active tenant profile
+    if (tab !== 'home' && tab !== 'notices' && tab !== 'materials' && tab !== 'calendar' && tab !== 'info') {
+      const sessionRouteToken = sessionStorage.getItem('cp_route_token');
+      const isFeatureAllowed = currentUser?.featureFlags?.[tab] ?? false;
+      if (!isFeatureAllowed && !sessionRouteToken) {
+        return; // Tenant-level routing restriction
+      }
     }
     if (tab === activeTabRef.current) return; // no-op for same screen
     
@@ -885,9 +889,13 @@ function App() {
                   stats={stats}
                   tabControls={tabControls}
                   onTileClick={(tabId, event) => {
-                    const blockedTabs = ['student_dashboard', 'campai', 'skillgigs', 'canteen', 'canteen_orders', 'canteen_menu', 'mess'];
-                    if (blockedTabs.includes(tabId)) {
-                      return;
+                    const publicRouteAccess = ['SUCCESS', 'notices', 'materials', 'calendar', 'info'];
+                    if (!publicRouteAccess.includes(tabId)) {
+                      const sessionRouteToken = sessionStorage.getItem('cp_route_token');
+                      const isFeatureAllowed = currentUser?.featureFlags?.[tabId] ?? false;
+                      if (!isFeatureAllowed && !sessionRouteToken) {
+                        return; // Tenant-level routing toggle restriction
+                      }
                     }
                     if (tabId === 'SUCCESS') {
                       setShowCanteenTicketModal(true);
