@@ -1,55 +1,21 @@
-CAMPOS PROPRIETARY LICENSE
+MIT License
 
-Copyright (c) 2026 Vardaan (Vplus1090). All Rights Reserved.
+Copyright (c) 2026 Vardaan (Vplus1090)
 
-This software, including but not limited to all source code, object code,
-documentation, design files, user interface assets, data models, and
-associated materials (collectively, the "Software"), is the exclusive
-property of the copyright holder named above (the "Owner").
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-1. NO LICENSE GRANTED
-   No license, right, or permission of any kind is granted to any person
-   or entity to use, copy, modify, merge, publish, distribute, sell,
-   sublicense, host, reverse-engineer, decompile, disassemble, or create
-   derivative works of the Software, in whole or in part, without the
-   prior express written consent of the Owner.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-2. RESTRICTED ACCESS
-   Access to the Software granted to any collaborator, contributor,
-   tester, or beta user is provided solely for the purpose of evaluating,
-   testing, or contributing to the Software at the direction of the
-   Owner. Such access does not transfer any ownership interest or
-   licensing right, and does not imply permission to copy, redistribute,
-   repurpose, or build competing products based on the Software or its
-   underlying design, architecture, branding, or functionality.
-
-3. CONFIDENTIALITY
-   Any non-public information regarding the Software's source code,
-   system architecture, data models, feature roadmap, or internal design
-   that is shared with a third party is confidential. It may not be
-   disclosed, copied, or used for any purpose outside the scope expressly
-   authorized in writing by the Owner.
-
-4. TRADEMARKS
-   "CampOS," its associated logo, and other brand elements are
-   trademarks or trade dress of the Owner. No rights to these marks are
-   granted under this license.
-
-5. NO WARRANTY
-   THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT
-   SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY
-   ARISING FROM OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
-
-6. ENFORCEMENT
-   Unauthorized use, reproduction, or distribution of the Software may
-   result in civil and/or criminal penalties under applicable law,
-   including the Copyright Act, 1957 (India) and the Information
-   Technology Act, 2000 (India).
-
-7. CONTACT
-   For licensing inquiries, permissions, or collaboration requests,
-   contact: vplus1090@gmail.com
-
-All rights not expressly granted herein are reserved by the Owner.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
