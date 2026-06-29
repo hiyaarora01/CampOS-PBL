@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, CaretLeft, PaperPlaneRight, UploadSimple, Trash, Warning, Check, Cards, Info, List, CaretDown, NotePencil, Plus, Microphone } from '@phosphor-icons/react';
+import { Brain, CaretLeft, PaperPlaneRight, UploadSimple, Trash, Warning, Check, Cards, Info, List, CaretDown, NotePencil, Plus, Microphone, CheckSquare } from '@phosphor-icons/react';
 import { API_BASE } from '../config/api';
 import { getUsername, getAttendanceFromCache, getSemesterFromCache } from '../utils/cache';
 import haptic from '../utils/haptic';
@@ -57,6 +57,18 @@ export default function CampAi({ currentUser, setActiveTab }) {
   const [activeDeck, setActiveDeck] = useState(null);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
+  const [masteredCards, setMasteredCards] = useState(() => {
+    try {
+      const saved = localStorage.getItem('campos_mastered_cards');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('campos_mastered_cards', JSON.stringify(masteredCards));
+  }, [masteredCards]);
 
   // Load saved decks on mount
   useEffect(() => {
@@ -973,20 +985,38 @@ export default function CampAi({ currentUser, setActiveTab }) {
                 className="flex-1 flex flex-col h-full overflow-y-auto pt-4 px-4 pb-48 scrollbar-none"
                 onScroll={handleScroll}
               >
-                {activeDeck ? (
-                  /* FLASHCARD VIEWER WORKSPACE */
-                  <div className="flex-1 flex flex-col items-center justify-center gap-6 py-4 min-h-[450px]">
-                    <div className="flex justify-between items-center w-full max-w-sm mb-2">
-                      <button
-                        onClick={() => setActiveDeck(null)}
-                        className="px-4 py-2 text-xs font-bold text-m3-primary hover:text-white bg-m3-surfaceContainerHigh rounded-full flex items-center gap-1.5 transition border-none shadow-sm cursor-pointer"
-                      >
-                        <CaretLeft size={14} /> Back to Decks
-                      </button>
-                      <span className="text-xs font-mono text-m3-onSurfaceVariant/70 bg-m3-surfaceContainerLow px-3 py-1 rounded-full">
-                        Card {activeCardIndex + 1} of {activeDeck.cards.length}
-                      </span>
-                    </div>
+                {activeDeck ? (() => {
+                  const currentDeckMasteredCount = activeDeck.cards.reduce((acc, _, idx) => {
+                    return acc + (masteredCards[`${activeDeck._id}_${idx}`] ? 1 : 0);
+                  }, 0);
+                  return (
+                    /* FLASHCARD VIEWER WORKSPACE */
+                    <div className="flex-1 flex flex-col items-center justify-center gap-6 py-4 min-h-[450px]">
+                      <div className="flex justify-between items-center w-full max-w-sm mb-2">
+                        <button
+                          onClick={() => setActiveDeck(null)}
+                          className="px-4 py-2 text-xs font-bold text-m3-primary hover:text-white bg-m3-surfaceContainerHigh rounded-full flex items-center gap-1.5 transition border-none shadow-sm cursor-pointer"
+                        >
+                          <CaretLeft size={14} /> Back to Decks
+                        </button>
+                        <span className="text-xs font-mono text-m3-onSurfaceVariant/70 bg-m3-surfaceContainerLow px-3 py-1 rounded-full">
+                          Card {activeCardIndex + 1} of {activeDeck.cards.length}
+                        </span>
+                      </div>
+
+                      {/* Gorgeous Progress Bar */}
+                      <div className="w-full max-w-sm flex flex-col gap-1.5 text-left -mt-2">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-m3-onSurfaceVariant/80">
+                          <span>Progress: {currentDeckMasteredCount} of {activeDeck.cards.length} Mastered</span>
+                          <span>{Math.round((currentDeckMasteredCount / activeDeck.cards.length) * 100)}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-m3-surfaceContainerHigh rounded-full overflow-hidden border border-white/5">
+                          <div 
+                            className="h-full bg-m3-primary transition-all duration-300"
+                            style={{ width: `${(currentDeckMasteredCount / activeDeck.cards.length) * 100}%` }}
+                          />
+                        </div>
+                      </div>
 
                     {/* Gorgeous 3D Flippable Card */}
                     <div 
@@ -1031,6 +1061,26 @@ export default function CampAi({ currentUser, setActiveTab }) {
                       </motion.div>
                     </div>
 
+                    {/* Mastered toggle */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const key = `${activeDeck._id}_${activeCardIndex}`;
+                        setMasteredCards(prev => ({
+                          ...prev,
+                          [key]: !prev[key]
+                        }));
+                      }}
+                      className={`flex items-center justify-center gap-2 w-full max-w-sm py-2.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition border cursor-pointer ${
+                        masteredCards[`${activeDeck._id}_${activeCardIndex}`]
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                          : 'bg-m3-surfaceContainerHigh border-white/5 text-m3-onSurfaceVariant hover:bg-m3-surfaceContainerHighest'
+                      }`}
+                    >
+                      <CheckSquare size={16} weight={masteredCards[`${activeDeck._id}_${activeCardIndex}`] ? "fill" : "regular"} />
+                      {masteredCards[`${activeDeck._id}_${activeCardIndex}`] ? 'Mastered' : 'Mark as Mastered'}
+                    </button>
+
                     {/* Card Navigation Controls */}
                     <div className="flex gap-4 w-full max-w-sm mt-2">
                       <button
@@ -1055,6 +1105,8 @@ export default function CampAi({ currentUser, setActiveTab }) {
                       </button>
                     </div>
                   </div>
+                  );
+                })()
                 ) : (
                   /* FLASHCARD DECKS LIST WORKSPACE */
                   <div className="flex flex-col gap-6 w-full">
