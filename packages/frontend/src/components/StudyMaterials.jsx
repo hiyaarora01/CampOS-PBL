@@ -80,22 +80,56 @@ export default function StudyMaterials({ currentUser, setActiveTab, initialBranc
   };
 
   // Next Upcoming Exam Countdown states
+  const [examList, setExamList] = useState([]);
+  const [isCountdownDismissed, setIsCountdownDismissed] = useState(() => {
+    return localStorage.getItem('campos_dismissed_exam_countdown') === 'true';
+  });
   const [nextExam, setNextExam] = useState(null);
   const [nextExamCountdown, setNextExamCountdown] = useState('');
+
+  // Fetch upcoming exams from database calendar
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/calendar`);
+        if (res.ok) {
+          const data = await res.json();
+          const parsedExams = data
+            .map(event => {
+              const parsedTime = Date.parse(event.date);
+              return {
+                name: event.category,
+                target: !isNaN(parsedTime) ? parsedTime : null
+              };
+            })
+            .filter(e => e.target !== null);
+          
+          if (parsedExams.length > 0) {
+            setExamList(parsedExams);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load calendar exams for countdown:", e);
+      }
+    };
+    fetchExams();
+  }, []);
 
   // Live Exam Countdown ticking effect
   useEffect(() => {
     const calculateCountdown = () => {
       const now = new Date().getTime();
       
-      const exams = [
+      const defaultExams = [
         { name: 'Mid-Term 1 (T1)', target: new Date('2026-06-25T09:00:00').getTime() },
         { name: 'Mid-Term 2 (T2)', target: new Date('2026-08-10T09:00:00').getTime() },
         { name: 'End-Sem Exams (T3)', target: new Date('2026-10-20T09:00:00').getTime() }
       ];
 
+      const activeExams = examList.length > 0 ? examList : defaultExams;
+
       // Find the first exam in the future
-      const upcoming = exams.find(e => e.target - now > 0);
+      const upcoming = activeExams.find(e => e.target - now > 0);
 
       if (upcoming) {
         setNextExam(upcoming);
@@ -116,7 +150,7 @@ export default function StudyMaterials({ currentUser, setActiveTab, initialBranc
     calculateCountdown();
     const interval = setInterval(calculateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [examList]);
 
   // Filtered Materials logic
   const availableSubjects = React.useMemo(() => {
@@ -300,18 +334,31 @@ export default function StudyMaterials({ currentUser, setActiveTab, initialBranc
       />
 
       <div onScroll={handleScroll} className="m3-screen__scroll" style={{ paddingBottom: 88 }}>
-        {nextExam && (
-          <div className="bg-[var(--m3-primary)] text-[var(--m3-on-primary)] shrink-0 flex items-center justify-between gap-3 rounded-[20px] p-4 shadow-sm">
+        {nextExam && !isCountdownDismissed && (
+          <div className="bg-[var(--m3-primary)] text-[var(--m3-on-primary)] shrink-0 flex items-center justify-between gap-3 rounded-[20px] p-4 shadow-sm relative overflow-hidden">
             <div className="flex flex-col text-left">
               <span className="text-[11px] font-bold uppercase tracking-widest opacity-85">Upcoming: {nextExam.name}</span>
               <span className="text-[18px] font-bold mt-0.5">
                 {nextExamCountdown}
               </span>
             </div>
-            <span className="relative flex w-2 h-2">
-              <span className="absolute inline-flex w-full h-full bg-[var(--m3-on-primary)]/40 rounded-full opacity-75 animate-ping" />
-              <span className="relative inline-flex w-2 h-2 bg-[var(--m3-on-primary)]" />
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full bg-[var(--m3-on-primary)]/40 rounded-full opacity-75 animate-ping" />
+                <span className="relative inline-flex w-2 h-2 bg-[var(--m3-on-primary)]" />
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCountdownDismissed(true);
+                  localStorage.setItem('campos_dismissed_exam_countdown', 'true');
+                }}
+                className="w-6 h-6 rounded-full hover:bg-[var(--m3-on-primary)]/10 text-[var(--m3-on-primary)] flex items-center justify-center transition border-none cursor-pointer text-xs font-bold"
+                title="Dismiss Countdown"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         )}
 
