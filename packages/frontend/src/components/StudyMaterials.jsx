@@ -324,6 +324,8 @@ export default function StudyMaterials({ currentUser, setActiveTab, initialBranc
     return groups;
   }, [filteredMaterials]);
 
+  const isUrgentExam = nextExam && (nextExam.target - new Date().getTime() < 5 * 24 * 60 * 60 * 1000);
+
   return (
     <div className="m3-screen study-materials-dashboard">
       <M3ScreenHeader
@@ -335,17 +337,28 @@ export default function StudyMaterials({ currentUser, setActiveTab, initialBranc
 
       <div onScroll={handleScroll} className="m3-screen__scroll" style={{ paddingBottom: 88 }}>
         {nextExam && !isCountdownDismissed && (
-          <div className="bg-[var(--m3-primary)] text-[var(--m3-on-primary)] shrink-0 flex items-center justify-between gap-3 rounded-[20px] p-4 shadow-sm relative overflow-hidden">
+          <div className={`shrink-0 flex items-center justify-between gap-3 rounded-[20px] p-4 shadow-sm relative overflow-hidden transition-all duration-300 ${
+            isUrgentExam 
+              ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white' 
+              : 'bg-[var(--m3-primary)] text-[var(--m3-on-primary)]'
+          }`}>
             <div className="flex flex-col text-left">
-              <span className="text-[11px] font-bold uppercase tracking-widest opacity-85">Upcoming: {nextExam.name}</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest opacity-85">
+                {isUrgentExam ? '⚠️ Urgent Exam Upcoming: ' : 'Upcoming: '}
+                {nextExam.name}
+              </span>
               <span className="text-[18px] font-bold mt-0.5">
                 {nextExamCountdown}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="relative flex w-2 h-2">
-                <span className="absolute inline-flex w-full h-full bg-[var(--m3-on-primary)]/40 rounded-full opacity-75 animate-ping" />
-                <span className="relative inline-flex w-2 h-2 bg-[var(--m3-on-primary)]" />
+                <span className={`absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping ${
+                  isUrgentExam ? 'bg-white/40' : 'bg-[var(--m3-on-primary)]/40'
+                }`} />
+                <span className={`relative inline-flex w-2 h-2 rounded-full ${
+                  isUrgentExam ? 'bg-white' : 'bg-[var(--m3-on-primary)]'
+                }`} />
               </span>
               <button
                 type="button"
@@ -353,7 +366,11 @@ export default function StudyMaterials({ currentUser, setActiveTab, initialBranc
                   setIsCountdownDismissed(true);
                   localStorage.setItem('campos_dismissed_exam_countdown', 'true');
                 }}
-                className="w-6 h-6 rounded-full hover:bg-[var(--m3-on-primary)]/10 text-[var(--m3-on-primary)] flex items-center justify-center transition border-none cursor-pointer text-xs font-bold"
+                className={`w-6 h-6 rounded-full flex items-center justify-center transition border-none cursor-pointer text-xs font-bold ${
+                  isUrgentExam 
+                    ? 'hover:bg-white/10 text-white' 
+                    : 'hover:bg-[var(--m3-on-primary)]/10 text-[var(--m3-on-primary)]'
+                }`}
                 title="Dismiss Countdown"
               >
                 ✕
