@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Calendar, Plus, Pencil, Trash, ArrowsCounterClockwise } from '@phosphor-icons/react';
+import { GraduationCap, Calendar, Plus, Pencil, Trash, ArrowsCounterClockwise, MagnifyingGlass } from '@phosphor-icons/react';
 import M3ScreenHeader from './M3ScreenHeader';
 import { API_BASE } from '../config/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ export default function AcademicCalendar({ currentUser, setActiveTab }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [events, setEvents] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -124,33 +125,38 @@ export default function AcademicCalendar({ currentUser, setActiveTab }) {
 
   const goBack = () => setActiveTab && setActiveTab('home');
 
+  const availableTags = React.useMemo(() => {
+    const tagsSet = new Set();
+    events.forEach(e => {
+      if (e.tags) {
+        e.tags.forEach(t => {
+          if (t.toLowerCase() !== 'odd sem') {
+            tagsSet.add(t.trim());
+          }
+        });
+      }
+    });
+    // Dynamically detect common tags and sort them nicely
+    const list = Array.from(tagsSet).filter(t => t.toLowerCase() !== 'exam' && t.toLowerCase() !== 'deadline');
+    return ['All', 'Exam', 'Deadline', ...list.sort()];
+  }, [events]);
+
   const filteredEvents = React.useMemo(() => {
     return events.filter((event) => {
-      if (selectedFilter === 'All') return true;
-      if (selectedFilter === 'Exams') {
-        return (
-          event.category.toLowerCase().includes('exam') || 
-          event.category.toLowerCase().includes('viva') || 
-          (event.tags && event.tags.some(t => t.toLowerCase().includes('exam')))
-        );
-      }
-      if (selectedFilter === 'Deadlines') {
-        return (
-          event.category.toLowerCase().includes('deadline') || 
-          (event.tags && event.tags.some(t => t.toLowerCase().includes('deadline') || t.toLowerCase().includes('collection')))
-        );
-      }
-      if (selectedFilter === 'Academic') {
-        return (
-          event.category.toLowerCase().includes('class') || 
-          event.category.toLowerCase().includes('project') || 
-          event.category.toLowerCase().includes('dissertation') || 
-          (event.tags && event.tags.some(t => t.toLowerCase().includes('sem') || t.toLowerCase().includes('academic')))
-        );
-      }
-      return true;
+      const matchesTag = 
+        selectedFilter === 'All' || 
+        (event.tags && event.tags.some(t => t.toLowerCase() === selectedFilter.toLowerCase())) ||
+        event.category.toLowerCase().includes(selectedFilter.toLowerCase());
+      
+      const matchesSearch = 
+        !searchQuery.trim() || 
+        event.category.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        event.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.tags && event.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())));
+        
+      return matchesTag && matchesSearch;
     });
-  }, [events, selectedFilter]);
+  }, [events, selectedFilter, searchQuery]);
 
   return (
     <div className="m3-screen academic-calendar-dashboard">
@@ -162,9 +168,23 @@ export default function AcademicCalendar({ currentUser, setActiveTab }) {
       />
 
       <div onScroll={handleScroll} className="m3-screen__scroll !gap-4 relative" style={{ paddingBottom: 88 }}>
-        {/* Category Filter Chips */}
+        {/* Advanced Search Bar */}
+        <div className="relative w-full text-left shrink-0">
+          <input
+            type="text"
+            placeholder="Search events, dates, or tags..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="m3-filled-field w-full pl-10 pr-4 !h-11"
+          />
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-m3-primary pointer-events-none">
+            <MagnifyingGlass size={16} />
+          </div>
+        </div>
+
+        {/* Dynamic Category/Tag Filter Chips */}
         <div className="m3-segmented-chips justify-center flex-wrap py-1 shrink-0">
-          {['All', 'Exams', 'Deadlines', 'Academic'].map((cat) => {
+          {availableTags.map((cat) => {
             const isActive = selectedFilter === cat;
             return (
               <button
@@ -187,7 +207,7 @@ export default function AcademicCalendar({ currentUser, setActiveTab }) {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                <span className="relative z-10">{cat}</span>
+                <span className="relative z-10">{cat}s</span>
               </button>
             );
           })}
